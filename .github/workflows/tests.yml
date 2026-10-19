@@ -1,0 +1,18 @@
+name: Python tests and quality
+on:
+  workflow_call: {}
+permissions:
+  contents: read
+jobs:
+  python:
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@0aa9122ba9e45774c2073ea0f98cf5db714e4a0f
+    with:
+      python-version: '3.14'
+      install-dependencies: true
+      use-uv-lock: true
+      dependency-extras: ''
+      run-lint: true
+      run-type-check: false
+      test-args: tests -q
+      coverage-threshold: 80
+      coverage-artifact-name: ottplay-python-coverage

@@ -1,0 +1,51 @@
+{
+  "title": "OTTPlay",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect OTTPlay Control Server",
+        "description": "Use a scoped operator token with comma-separated player IDs. Administrator tokens can discover all registered players when IDs are blank. The token controls the selected players; use HTTPS or a trusted local network. Credentials remain in Home Assistant.",
+        "data": {
+          "url": "Control server URL",
+          "token": "Operator or administrator token",
+          "devices": "Player IDs (blank for administrator discovery)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Connect OTTPlay Control Server",
+        "description": "Use a scoped operator token with comma-separated player IDs. Administrator tokens can discover all registered players when IDs are blank. The token controls the selected players; use HTTPS or a trusted local network. Credentials remain in Home Assistant.",
+        "data": {
+          "url": "Control server URL",
+          "token": "Operator or administrator token",
+          "devices": "Player IDs (blank for administrator discovery)"
+        }
+      },
+      "reconfigure": {
+        "title": "Connect OTTPlay Control Server",
+        "description": "Use a scoped operator token with comma-separated player IDs. Administrator tokens can discover all registered players when IDs are blank. The token controls the selected players; use HTTPS or a trusted local network. Credentials remain in Home Assistant.",
+        "data": {
+          "url": "Control server URL",
+          "token": "Operator or administrator token",
+          "devices": "Player IDs (blank for administrator discovery)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "The token is invalid or lacks device/action permissions. A scoped token requires explicit player IDs; leave IDs blank only for an administrator token.",
+      "cannot_connect": "Cannot connect to the control server.",
+      "invalid_input": "Enter an HTTP(S) server URL, a valid token and comma-separated unique player IDs."
+    },
+    "abort": {
+      "already_configured": "This control server is already configured.",
+      "reauth_successful": "Authentication updated.",
+      "reconfigure_successful": "Configuration updated."
+    }
+  },
+  "entity": {
+    "remote": {
+      "navigation": {
+        "name": "Navigation"
+      }
+    }
+  }
+}
