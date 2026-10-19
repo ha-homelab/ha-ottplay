@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="390" viewBox="0 0 1100 390" role="img" aria-labelledby="title desc">
+<title id="title">OTTPlay and Home Assistant</title>
+<desc id="desc">Home Assistant sends restricted API requests to the controller. Registered players poll the controller and return observed state. Commands are sent only on user or automation requests.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#93c5fd"/></marker></defs>
+<rect width="1100" height="390" rx="20" fill="#0f172a"/>
+<text x="40" y="52" fill="#f8fafc" font-family="sans-serif" font-size="28" font-weight="bold">One controller. Native Home Assistant entities.</text>
+<g font-family="sans-serif" text-anchor="middle">
+<rect x="40" y="110" width="280" height="170" rx="16" fill="#075985"/>
+<text x="180" y="150" fill="white" font-size="24">Home Assistant</text>
+<text x="180" y="188" fill="#e0f2fe" font-size="18">media_player + remote</text>
+<text x="180" y="226" fill="#e0f2fe" font-size="16">Restricted operator token</text>
+<rect x="410" y="110" width="280" height="170" rx="16" fill="#5b21b6"/>
+<text x="550" y="150" fill="white" font-size="24">OTTPlay controller</text>
+<text x="550" y="188" fill="#ede9fe" font-size="18">Existing registry + queue</text>
+<text x="550" y="226" fill="#ede9fe" font-size="16">Bounded request / response</text>
+<rect x="780" y="110" width="280" height="170" rx="16" fill="#065f46"/>
+<text x="920" y="150" fill="white" font-size="24">OTTPlay players</text>
+<text x="920" y="188" fill="#d1fae5" font-size="18">TV · browser · app</text>
+<text x="920" y="226" fill="#d1fae5" font-size="16">Outbound connection</text>
+<path d="M330 170 H398 M700 170 H768 M770 228 H702 M400 228 H332" stroke="#93c5fd" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="550" y="330" fill="#cbd5e1" font-size="18">Commands on demand · Observed state · No MQTT bridge · No inbound TV port</text>
+</g></svg>

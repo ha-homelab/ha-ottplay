@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "repository": "ha-homelab/ha-ottplay",
+  "visibility": "public",
+  "mode": "release",
+  "default_branch": "main",
+  "version_file": "version",
+  "validation_workflows": [
+    "tests.yml",
+    "validate.yml",
+    "security.yml"
+  ],
+  "artifact_pattern": "release-assets*",
+  "local_checks": [
+    "python3 -m ruff check custom_components tests scripts/package_release.py",
+    "python3 -m ruff format --check custom_components tests scripts/package_release.py",
+    "python3 -m pytest -q"
+  ],
+  "single_entry_ci": true,
+  "release_notes": "CHANGELOG.md",
+  "notes": [
+    "Entities are discovered from a configured OTTPlay Control Server. A registered device is unavailable while disconnected; HTTP command acceptance alone is not proof of playback.",
+    "Both release archives carry the same versioned integration: ottplay.zip is the HACS root layout; ha-ottplay.zip is the manual custom_components/ottplay layout. Household endpoints, identifiers, tokens, and live captures are excluded.",
+    "Unit and Home Assistant runtime tests cover simulated server behavior. Real server installation and observed commands are separate acceptance evidence, not a guarantee for every platform."
+  ],
+  "versioning": {
+    "schema": 1,
+    "promotion": "promote-bytes",
+    "files": [
+      {
+        "path": "version",
+        "format": "text",
+        "value": "package",
+        "ecosystem": "pep440"
+      },
+      {
+        "path": "pyproject.toml",
+        "format": "toml",
+        "field": "project.version",
+        "value": "package",
+        "ecosystem": "pep440"
+      },
+      {
+        "path": "custom_components/ottplay/manifest.json",
+        "format": "json",
+        "field": "version",
+        "value": "package",
+        "ecosystem": "pep440"
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "ha-ottplay.zip",
+        "format": "zip-json",
+        "member": "custom_components/ottplay/manifest.json",
+        "field": "version",
+        "value": "package",
+        "ecosystem": "pep440"
+      },
+      {
+        "path": "ottplay.zip",
+        "format": "zip-json",
+        "member": "manifest.json",
+        "field": "version",
+        "value": "package",
+        "ecosystem": "pep440"
+      }
+    ],
+    "toolkit_revision": "0aa9122ba9e45774c2073ea0f98cf5db714e4a0f"
+  },
+  "toolkit_revision": "0aa9122ba9e45774c2073ea0f98cf5db714e4a0f",
+  "sign_releases": true
+}
