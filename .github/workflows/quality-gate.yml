@@ -1,0 +1,32 @@
+name: Metadata bootstrap validation
+on:
+  pull_request: {}
+  merge_group: {}
+permissions:
+  contents: read
+jobs:
+  gate:
+    name: CI gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Validate the licensing bootstrap scope
+        shell: python3 {0}
+        run: |
+          import pathlib
+          import subprocess
+          expected = {"README.md", "LICENSE", ".github/workflows/quality-gate.yml", ".github/workflows/auto-approve.yml"}
+          tracked = set(subprocess.check_output(["git", "ls-files", "-z"], text=True).strip("\0").split("\0"))
+          if tracked != expected:
+              raise SystemExit("Bootstrap must contain only metadata; replace this gate with implementation validation when adding code")
+          license_text = pathlib.Path("LICENSE").read_text()
+          clauses = ("MIT License", "Permission is hereby granted, free of charge", "THE SOFTWARE IS PROVIDED \"AS IS\"")
+          if not all(clause in license_text for clause in clauses):
+              raise SystemExit("The complete MIT license is required")
+          print("Metadata-only bootstrap contains the MIT license and no executable integration")
