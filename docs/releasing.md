@@ -18,6 +18,10 @@ packs tracked integration inputs with fixed ZIP metadata, producing:
 - `ha-ottplay.zip`: `custom_components/ottplay/…`, for manual installation.
 - `SHA256SUMS` and the shared release evidence/manifest.
 
+Each release needs a `## [base-version]` section in `CHANGELOG.md` with substantive
+`### Upgrade` and `### Security` guidance; the repository tests validate the
+current notes through the actual release parser before publication.
+
 Beta/RC packages carry the corresponding integration version. Stable publication
 uses the shared verified promotion process. Never move a published tag or replace
 an existing release with different bytes. An updated implementation requires a
