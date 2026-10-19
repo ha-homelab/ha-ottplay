@@ -9,7 +9,7 @@ from homeassistant.const import CONF_TOKEN, CONF_URL
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import TextSelector, TextSelectorConfig, TextSelectorType
 
-from .api import AuthError, OttplayClient, OttplayError, PlayerUnavailable
+from .api import AuthError, OttplayClient, OttplayError
 from .const import CONF_DEVICES, DEVICE_ID_PATTERN, DOMAIN, MAX_DEVICES
 
 PASSWORD = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
@@ -63,13 +63,10 @@ class OttplayConfigFlow(ConfigFlow, domain=DOMAIN):
                 client = OttplayClient(
                     async_get_clientsession(self.hass), user_input[CONF_URL], user_input[CONF_TOKEN]
                 )
-                # An offline player may still be configured: the successful POST
-                # authenticates the scope before the response wait times out.
+                # A 202 acceptance verifies credentials without waiting for an
+                # offline player. Validation queues only a harmless status read.
                 if devices:
-                    try:
-                        await client.async_call(devices[0], "status", {})
-                    except PlayerUnavailable:
-                        pass
+                    await client.async_validate(devices[0])
                 else:
                     await client.async_devices()
                 await self.async_set_unique_id(client.url)

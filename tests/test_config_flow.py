@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 import pytest
 from homeassistant import loader
+from homeassistant.auth import auth_manager_from_config
 from homeassistant.bootstrap import async_load_base_functionality
 from homeassistant.helpers import device_registry as dr
 
@@ -30,6 +31,7 @@ async def bootstrap(hass):
     )
     loader.async_setup(hass)
     assert await async_load_base_functionality(hass)
+    hass.auth = await auth_manager_from_config(hass, [], [])
 
 
 async def test_real_ha_setup_reconfigure_discovery_and_unload(hass, snapshot):
@@ -56,8 +58,8 @@ async def test_real_ha_setup_reconfigure_discovery_and_unload(hass, snapshot):
         assert len(hass.states.async_all("remote")) == 1
         entity_id = players[0].entity_id
         registry = dr.async_get(hass)
-        registered = registry.async_get_device(
-            identifiers={("ottplay", f"{entry.entry_id}:test-player")}
+        registered = registry.async_get_device_by_identifier(
+            ("ottplay", f"{entry.entry_id}:test-player"), entry.entry_id
         )
         registry.async_update_device(registered.id, name_by_user="My chosen player")
         # The token changes through the actual reauthentication flow.
@@ -103,3 +105,34 @@ async def test_real_flow_auth_error_no_entry(hass):
         )
         assert result["errors"] == {"base": "invalid_auth"}
         assert not hass.config_entries.async_entries("ottplay")
+
+
+async def test_scoped_offline_flow_validates_acceptance_without_polling(hass):
+    await bootstrap(hass)
+    with (
+        patch("custom_components.ottplay.config_flow.async_get_clientsession", return_value=None),
+        patch(
+            "custom_components.ottplay.api.OttplayClient.async_validate", return_value=None
+        ) as validate,
+        patch("custom_components.ottplay.async_setup_entry", return_value=True),
+        patch("custom_components.ottplay.api.OttplayClient.async_call") as call,
+    ):
+        flow = await hass.config_entries.flow.async_init("ottplay", context={"source": "user"})
+        result = await hass.config_entries.flow.async_configure(
+            flow["flow_id"],
+            {
+                "url": "https://control.example/",
+                "token": "a" * 32,
+                "devices": "offline, namespace:tv",
+            },
+        )
+        assert result["type"] == "create_entry"
+        validate.assert_awaited_once_with("offline")
+        call.assert_not_awaited()
+        await hass.async_block_till_done()
+        again = await hass.config_entries.flow.async_init("ottplay", context={"source": "user"})
+        result = await hass.config_entries.flow.async_configure(
+            again["flow_id"],
+            {"url": "https://control.example", "token": "a" * 32, "devices": "offline"},
+        )
+        assert result["reason"] == "already_configured"

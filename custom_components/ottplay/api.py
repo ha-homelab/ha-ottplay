@@ -190,7 +190,9 @@ class OttplayClient:
                     self._cooldown_until = self._next_request
                     raise RateLimited("Control server rate limit reached")
                 if status == 404:
-                    raise PlayerUnavailable("The request receipt is missing or expired")
+                    if method == "GET" and path == "/api/requests" and params and "id" in params:
+                        raise PlayerUnavailable("The request receipt is missing or expired")
+                    raise ProtocolError("Control server endpoint is unavailable")
                 if status >= 500:
                     raise CannotConnect("Control server unavailable")
                 if status not in (200, 202):

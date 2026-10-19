@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock
 
 import aiohttp
 import pytest
+from aiohttp import web
 
 from custom_components.ottplay import api
 from custom_components.ottplay.api import (
@@ -181,7 +182,7 @@ async def test_lost_submit_response_is_never_retried_or_exposed():
         (403, AuthError),
         (302, ProtocolError),
         (500, CannotConnect),
-        (404, PlayerUnavailable),
+        (404, ProtocolError),
     ],
 )
 async def test_http_errors_redact_response_and_do_not_redirect(status, error):
@@ -263,6 +264,13 @@ async def test_mismatched_receipt_fails_closed():
     value, _ = client(Response(202, {"id": RID}), receipt({}, request_id="b" * 32))
     with pytest.raises(ProtocolError, match="mismatched"):
         await value.async_call("d1", "status", {})
+
+
+async def test_expired_receipt_is_not_treated_as_unsubmitted():
+    value, session = client(Response(202, {"id": RID}), Response(404, {}))
+    with pytest.raises(PlayerUnavailable, match="expired"):
+        await value.async_call("d1", "play", {"query": "1"})
+    assert [item[0] for item in session.calls] == ["POST", "GET"]
 
 
 async def test_pending_deadline_does_not_repeat_mutation(monkeypatch):
@@ -419,3 +427,55 @@ async def test_malformed_observations_fail_closed(change):
     value.async_call = AsyncMock(side_effect=[status, capabilities, envelope])
     with pytest.raises(ProtocolError):
         await value.async_snapshot("d1")
+
+
+async def test_real_http_wire_and_redirect_boundary():
+    """Exercise aiohttp itself, so mocks cannot hide query/header mistakes."""
+    calls = []
+    redirected = []
+
+    async def endpoint(request):
+        assert request.headers["Authorization"] == "Bearer " + TOKEN
+        assert request.headers["User-Agent"].startswith("ha-ottplay/")
+        calls.append((request.method, dict(request.query)))
+        if request.method == "POST":
+            assert dict(request.query) == {"device_id": "room:1"}
+            assert await request.json() == {
+                "action": "playback",
+                "params": {"operation": "next_channel"},
+            }
+            return web.json_response({"id": RID}, status=202)
+        assert dict(request.query) == {"device_id": "room:1", "id": RID}
+        return web.json_response({"id": RID, "status": "ok", "data": {"dispatched": True}})
+
+    async def redirect(_request):
+        raise web.HTTPFound("/private-target")
+
+    async def target(request):
+        redirected.append(dict(request.headers))
+        return web.json_response({"devices": []})
+
+    app = web.Application()
+    app.router.add_route("*", "/control/api/requests", endpoint)
+    app.router.add_get("/control/api/devices", redirect)
+    app.router.add_get("/private-target", target)
+    runner = web.AppRunner(app, access_log=None)
+    await runner.setup()
+    site = web.TCPSite(runner, "127.0.0.1", 0)
+    await site.start()
+    try:
+        port = runner.addresses[0][1]
+        async with aiohttp.ClientSession() as session:
+            value = OttplayClient(session, f"http://127.0.0.1:{port}/control", TOKEN)
+            assert await value.async_call("room:1", "playback", {"operation": "next_channel"}) == {
+                "dispatched": True
+            }
+            with pytest.raises(ProtocolError):
+                await value.async_devices()
+        assert calls == [
+            ("POST", {"device_id": "room:1"}),
+            ("GET", {"device_id": "room:1", "id": RID}),
+        ]
+        assert not redirected
+    finally:
+        await runner.cleanup()

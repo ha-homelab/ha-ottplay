@@ -1,7 +1,8 @@
 """Media properties report observations; commands are never guessed or replayed."""
 
 from dataclasses import replace
-from unittest.mock import AsyncMock
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from homeassistant.components.media_player import MediaPlayerEntityFeature as Feature
@@ -135,6 +136,63 @@ async def test_diagnostics_no_secrets(hass, entry, coordinator):
     import json
 
     entry.runtime_data = coordinator
-    encoded = json.dumps(await async_get_config_entry_diagnostics(hass, entry))
+    with patch(
+        "custom_components.ottplay.diagnostics.async_get_integration",
+        return_value=SimpleNamespace(version="0.2.0-beta.1"),
+    ):
+        report = await async_get_config_entry_diagnostics(hass, entry)
+    assert report["integration_version"] == "0.2.0-beta.1"
+    encoded = json.dumps(report)
     for value in [entry.entry_id, "test-player", "control.example", "a" * 32, "page-1", "1.1.56"]:
         assert value not in encoded
+
+
+async def test_signed_step_supports_both_channel_buttons(coordinator, snapshot):
+    coordinator.async_set_updated_data(
+        {
+            "test-player": replace(
+                snapshot, capabilities={"playback": ["next_channel", "step_channel"]}
+            )
+        }
+    )
+    coordinator.async_command = AsyncMock()
+    entity = OttplayMediaPlayer(coordinator, "test-player")
+    assert entity.supported_features & Feature.PREVIOUS_TRACK
+    assert entity.supported_features & Feature.NEXT_TRACK
+    await entity.async_media_previous_track()
+    coordinator.async_command.assert_awaited_with(
+        "test-player", "playback", {"operation": "step_channel", "offset": -1}
+    )
+    await entity.async_media_next_track()
+    coordinator.async_command.assert_awaited_with(
+        "test-player", "playback", {"operation": "next_channel"}
+    )
+    coordinator.async_set_updated_data(
+        {"test-player": replace(snapshot, capabilities={"playback": ["step_channel"]})}
+    )
+    await entity.async_media_next_track()
+    coordinator.async_command.assert_awaited_with(
+        "test-player", "playback", {"operation": "step_channel", "offset": 1}
+    )
+
+
+async def test_diagnostics_filters_untrusted_capability_strings(hass, entry, coordinator, snapshot):
+    import json
+
+    untrusted = ["https://private.example/secret-token", "private viewing title"]
+    coordinator.async_set_updated_data(
+        {
+            "test-player": replace(
+                snapshot, capabilities={"playback": ["pause", "step_channel", "pause", *untrusted]}
+            )
+        }
+    )
+    entry.runtime_data = coordinator
+    with patch(
+        "custom_components.ottplay.diagnostics.async_get_integration",
+        return_value=SimpleNamespace(version="0.1.0"),
+    ):
+        report = await async_get_config_entry_diagnostics(hass, entry)
+    assert report["players"][0]["playback_operations"] == ["pause", "step_channel"]
+    encoded = json.dumps(report)
+    assert all(value not in encoded for value in untrusted)

@@ -51,6 +51,10 @@ class OttplayMediaPlayer(OttplayEntity, MediaPlayerEntity):
             return features
         for operation in snapshot.capabilities.get("playback", []):
             features |= FEATURES.get(operation, MediaPlayerEntityFeature(0))
+        if "step_channel" in snapshot.capabilities.get("playback", []):
+            features |= (
+                MediaPlayerEntityFeature.PREVIOUS_TRACK | MediaPlayerEntityFeature.NEXT_TRACK
+            )
         if self.volume_level is not None:
             features |= MediaPlayerEntityFeature.VOLUME_SET
         if snapshot.status.get("ready") is True:
@@ -136,10 +140,16 @@ class OttplayMediaPlayer(OttplayEntity, MediaPlayerEntity):
         await self._playback("pause")
 
     async def async_media_next_track(self) -> None:
-        await self._playback("next_channel")
+        if self.snapshot and "next_channel" in self.snapshot.capabilities.get("playback", []):
+            await self._playback("next_channel")
+        else:
+            await self._playback("step_channel", offset=1)
 
     async def async_media_previous_track(self) -> None:
-        await self._playback("previous_channel")
+        if self.snapshot and "previous_channel" in self.snapshot.capabilities.get("playback", []):
+            await self._playback("previous_channel")
+        else:
+            await self._playback("step_channel", offset=-1)
 
     async def async_media_seek(self, position: float) -> None:
         if not math.isfinite(position) or not 0 <= position <= 315576000:

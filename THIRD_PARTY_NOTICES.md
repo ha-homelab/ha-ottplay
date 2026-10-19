@@ -8,5 +8,5 @@ notice is preserved in `custom_components/ottplay/brand/LICENSE.ottplay-foss`.
 The shared release tools in `scripts/`, workflow helpers and generated workflows
 come from [venus-os-ci-toolkit](https://github.com/victron-venus/venus-os-ci-toolkit),
 at the exact revision in `.release-policy.json`. Their headers and notices are
-retained. Test dependencies and their license metadata are pinned in `uv.lock`;
+retained; see [the toolkit license](docs/LICENSE.venus-os-ci-toolkit). Test dependencies and their license metadata are pinned in `uv.lock`;
 Home Assistant's code is not bundled in the integration release.

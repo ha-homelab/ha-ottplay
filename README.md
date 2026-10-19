@@ -19,7 +19,9 @@ a listening port on the TV, an MQTT broker, or a second bridge process.
 - UI configuration, credential replacement, English/Russian translations and redacted diagnostics.
 - Stable entity identities, including across player restarts.
 
-Capabilities depend on the player build, playback mode and connection. The
+Capabilities depend on the player build, playback mode and connection.
+Stop and hardware power buttons are not exposed: standby/wake can have different
+semantics on each player and are not substituted for playback stop/resume. The
 integration does not invent a current title, artwork or hardware power state.
 A controller acknowledgement means the handler replied; it does not prove that
 a picture is visible or sound is audible. State comes from a subsequent read.

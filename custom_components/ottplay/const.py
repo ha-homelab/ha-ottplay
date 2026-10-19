@@ -41,4 +41,5 @@ REQUIRED_ACTIONS = (
     "playback.seek",
     "playback.previous_channel",
     "playback.next_channel",
+    "playback.step_channel",
 ) + tuple("input." + key for key in INPUT_KEYS)

@@ -18,7 +18,9 @@ Keep the token outside Git. Add the same device IDs to the integration form.
 Only select players you intend to expose to Home Assistant users and automations.
 
 The exact action grants used by this release are documented with the implementation
-in `custom_components/ottplay/const.py`. Do not grant screenshots, provider-secret
+in `REQUIRED_ACTIONS` in `custom_components/ottplay/const.py`. The list includes
+read-only status/capabilities/inspection, channel selection, playback operations,
+volume adjustment and the enumerated navigation keys. Do not grant screenshots, provider-secret
 access, updates or device reboot merely to use media controls.
 
 Current server policy reserves `/api/devices` for administrators. Consequently,

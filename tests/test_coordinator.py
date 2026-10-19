@@ -105,3 +105,48 @@ async def test_concurrent_commands_not_queued(hass, entry, client, snapshot):
     assert client.async_call.await_count == 1
     await hass.async_block_till_done()
     await coordinator.async_shutdown()
+
+
+async def test_snapshot_cannot_restore_state_from_before_command(hass, entry, client, snapshot):
+    coordinator = OttplayCoordinator(hass, entry, client)
+    coordinator._initialized = True
+    coordinator.async_set_updated_data({"test-player": snapshot})
+    coordinator.async_request_refresh = AsyncMock()
+    entered, release = asyncio.Event(), asyncio.Event()
+
+    async def slow_snapshot(device_id):
+        entered.set()
+        await release.wait()
+        return snapshot
+
+    client.async_snapshot.side_effect = slow_snapshot
+    refresh = asyncio.create_task(coordinator._async_update_data())
+    await entered.wait()
+    await coordinator.async_command("test-player", "input", {"key": "ok"})
+    release.set()
+    result = await refresh
+    assert result["test-player"] is None
+    assert coordinator._next_poll["test-player"] == -1
+    await hass.async_block_till_done()
+    await coordinator.async_shutdown()
+
+
+async def test_cancelled_command_does_not_spawn_refresh(hass, entry, client, snapshot):
+    coordinator = OttplayCoordinator(hass, entry, client)
+    coordinator.async_set_updated_data({"test-player": snapshot})
+    coordinator.async_request_refresh = AsyncMock()
+    entered = asyncio.Event()
+
+    async def pending(*args):
+        entered.set()
+        await asyncio.Event().wait()
+
+    client.async_call.side_effect = pending
+    command = asyncio.create_task(coordinator.async_command("test-player", "input", {"key": "ok"}))
+    await entered.wait()
+    command.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await command
+    assert coordinator.data["test-player"] is None
+    coordinator.async_request_refresh.assert_not_awaited()
+    await coordinator.async_shutdown()

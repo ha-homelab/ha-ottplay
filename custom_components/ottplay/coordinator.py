@@ -142,7 +142,9 @@ class OttplayCoordinator(DataUpdateCoordinator[dict[str, PlayerSnapshot | None]]
                 self._generation[device_id] += 1
                 self._next_poll[device_id] = -1
                 self.async_set_updated_data({**self.data, device_id: None})
-                self.entry.async_create_background_task(
-                    self.hass, self.async_request_refresh(), "OTTPlay command observations"
-                )
+                task = asyncio.current_task()
+                if task is None or not task.cancelling():
+                    self.entry.async_create_background_task(
+                        self.hass, self.async_request_refresh(), "OTTPlay command observations"
+                    )
             return responses
