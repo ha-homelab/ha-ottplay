@@ -24,7 +24,7 @@ def navigation():
         f'dir="{item.get("dir", "ltr")}">{html.escape(item["label"])}</a>'
         for item in LANGUAGES
     ]
-    rows = [" · ".join(links[index:index + 8]) for index in range(0, len(links), 8)]
+    rows = [" · ".join(links[index : index + 8]) for index in range(0, len(links), 8)]
     return START + '\n<p dir="ltr">\n' + "<br>\n".join(rows) + "\n</p>\n" + END
 
 
@@ -62,8 +62,7 @@ def main():
             errors.append(f"{name}: unresolved placeholder or unbalanced code fences")
         if fenced(text) != fenced(source):
             errors.append(f"{name}: code examples differ from English")
-        # Preserve the existing Russian page, whose scope predates this expansion.
-        if item["code"] not in {"en", "ru"}:
+        if item["code"] != "en":
             if inline_code(text) != inline_code(source):
                 errors.append(f"{name}: inline commands or identifiers differ")
             if not technical_links <= set(markdown_links(text)):

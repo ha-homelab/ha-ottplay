@@ -8,7 +8,8 @@ links declare right-to-left text direction.
 `README.md` is the source for documentation updates. The 22 translations added
 in this expansion cover its complete introduction, capabilities, limitations,
 installation instructions, authorization modes, automation examples and
-development workflow. Existing English and Russian content is preserved.
+development workflow. The Russian translation also covers the complete source;
+the English content is preserved.
 Other guides keep their existing language coverage. Documentation translations
 do not add languages to the integration's user interface.
 
@@ -25,6 +26,6 @@ python3 scripts/check_readme_translations.py
 
 The script checks the language-file inventory, navigation attributes, matching
 YAML examples, preserved commands and identifiers, section counts and local link
-targets. It checks technical completeness of the 22 new translations against
-English; the older Russian page retains its previous scope. These structural
+targets. It checks technical completeness of all 23 translations against
+English. These structural
 checks do not replace reading the translations for accuracy and fluency.
