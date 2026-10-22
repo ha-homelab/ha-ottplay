@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "language": "python",
+  "setup": [
+    [
+      "python3",
+      "-m",
+      "venv",
+      ".fuzz-venv"
+    ],
+    [
+      ".fuzz-venv/bin/python",
+      "-m",
+      "pip",
+      "install",
+      "--require-hashes",
+      "--only-binary=:all:",
+      "-r",
+      ".github/requirements-fuzz.txt"
+    ]
+  ],
+  "targets": [
+    {
+      "name": "protocol",
+      "engine": "atheris",
+      "command": [
+        ".fuzz-venv/bin/python",
+        "fuzz/fuzz_protocol.py",
+        "-max_len=8192"
+      ],
+      "seconds": 60,
+      "corpus": "fuzz/corpus/protocol",
+      "instrumentation": [
+        {
+          "module": "protocol",
+          "functions": [
+            "normalize_url",
+            "valid_number"
+          ]
+        }
+      ]
+    }
+  ],
+  "preflight-paths": [
+    "custom_components/ottplay",
+    "fuzz",
+    "tests"
+  ]
+}

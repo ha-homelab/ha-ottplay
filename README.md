@@ -1,5 +1,7 @@
 # OTTPlay for Home Assistant
 
+[![RC fuzzing](https://img.shields.io/badge/fuzzing-RC_only-0a9f8f)](docs/fuzzing.md)
+
 [Русский](README.ru.md) · [Architecture](docs/architecture.md) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
 
 Control registered OTTPlay players from Home Assistant through your existing
