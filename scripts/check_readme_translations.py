@@ -9,7 +9,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-LANGUAGES = json.loads((ROOT / "docs/languages.json").read_text())
+LANGUAGES = json.loads((ROOT / "docs/languages.json").read_text(encoding="utf-8"))
 START = "<!-- language-navigation:start -->"
 END = "<!-- language-navigation:end -->"
 
@@ -47,7 +47,7 @@ def main():
     errors = []
     if actual != expected:
         errors.append(f"README language files differ: {sorted(actual ^ expected)}")
-    source = (ROOT / "README.md").read_text()
+    source = (ROOT / "README.md").read_text(encoding="utf-8")
     nav = navigation()
     technical_links = set(markdown_links(source)) - expected
     for item in LANGUAGES:
@@ -55,7 +55,7 @@ def main():
         path = ROOT / name
         if not path.exists():
             continue
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         if text.count(START) != 1 or text.count(END) != 1 or nav not in text:
             errors.append(f"{name}: navigation differs from docs/languages.json")
         if "@@" in text or text.count("```") != source.count("```"):
