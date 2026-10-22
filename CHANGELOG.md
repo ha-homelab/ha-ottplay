@@ -2,6 +2,11 @@
 
 ## [0.1.0]
 
+### Fuzz validation
+
+- Add bounded public-RC fuzzing of production input boundaries, committed seeds, regression checks and source-bound campaign evidence. Beta and ordinary CI events do not run timed mutation.
+- Reuse pure URL/numeric admission helpers in the live client and fuzz harness; reject oversized integer values without a float-conversion overflow.
+
 Initial custom Home Assistant integration for registered OTTPlay players.
 
 - Native media-player and remote entities using the existing controller API.
