@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.1]
+
+- Keep the last observed player state while confirming volume, playback and remote commands, avoiding false `unavailable` transitions and disappearing dashboard cards.
+- Refresh the affected player directly after commands, outside its command lock, without waiting for the fleet poll. Discard older overlapping observations and cancel pending reads during shutdown.
+- Continue reporting genuine observation failures as unavailable; command acknowledgements never fabricate playback state, and uncertain commands are never replayed.
+
+### Upgrade
+
+Install the updated integration through HACS or replace only
+`custom_components/ottplay` with the manual release archive, then restart Home
+Assistant Core. Existing entries, entity IDs and dashboards need no
+reconfiguration. A configuration-entry reload alone does not load changed Python
+modules. Back up the installed integration before updating.
+
+### Security
+
+The existing controller URL, scoped operator token and command restrictions are
+unchanged. Authentication failures still require reauthentication; a successful
+read from one player cannot clear a server-wide failure. No new credentials or
+permissions are required.
+
 ## [0.1.0]
 
 ### Fuzz validation
