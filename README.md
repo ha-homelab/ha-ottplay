@@ -91,6 +91,22 @@ Replace example entity IDs with those created on your system. Channel selection
 uses the player's current provider; it does not upload an arbitrary media URL.
 Configuration does not start playback or operate physical TV power.
 
+**Troubleshooting state updates:** after a volume or playback command, the
+integration keeps the last observed state while it reads the affected player
+again. Command acceptance alone does not change the reported state, and a
+pending confirmation does not make a connected player unavailable. A failed
+observation or an actual loss of connection still makes the entity unavailable.
+
+If your dashboard's **Other players** card excludes unavailable entities, a
+player disappears from that card while unavailable and returns after a successful
+observation. Sorting by friendly name only changes its position in the list.
+Check the entity in **Developer tools → States** to distinguish a filtered card
+from a missing entity.
+
+After upgrading this integration, restart **Home Assistant Core** to load the
+updated Python code. Reloading only the OTTPlay configuration entry recreates its
+connection but does not replace Python modules already loaded in memory.
+
 ## Development and releases
 
 Use Python 3.14 and `uv sync --locked`, then `uv run pytest -q`,
