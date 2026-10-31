@@ -33,3 +33,9 @@ A failure must become a committed regression seed and a focused production fix b
 The harness and gates are being introduced in this change. The first accepted RC and its source-bound report will be recorded after the actual campaign succeeds; the documentation badge indicates RC-only adoption, not a coverage guarantee.
 
 [Shared execution, evidence and promotion contract](https://github.com/victron-venus/venus-os-ci-toolkit/blob/5087530d6f327565b818fd84f64639abe03ad5e3/docs/rc-fuzzing.md).
+
+## Artifact selection and retries
+
+Release artifacts use `-run-<run_id>-attempt-<run_attempt>` names, and the collector selects only the current run and attempt. After a failed release attempt, use **Re-run all jobs**; retrying only failed jobs can leave required current-attempt inputs missing. Older artifacts must not fill those gaps.
+
+Fuzzing still requires an explicit RC dispatch from the default branch of a public repository. Its report identifies one source revision and run; it does not prove complete platform coverage or device acceptance. Package receipts additionally bind fresh package publication to the current repository, source SHA, run ID and attempt. Historical promotion and retained-evidence validation keep their existing checks; complete package-set coverage remains a separate requirement. Receipts created before the migration or offline without an Actions identity cannot qualify fresh publication. Run all required producers in one complete workflow attempt after migration; existing release approval and acceptance policies still apply. See [the shared evidence contract](rc-fuzzing.md).
