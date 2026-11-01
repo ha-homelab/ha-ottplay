@@ -66,7 +66,11 @@
         "ecosystem": "pep440"
       }
     ],
-    "toolkit_revision": "0aa9122ba9e45774c2073ea0f98cf5db714e4a0f"
+    "toolkit_revision": "0aa9122ba9e45774c2073ea0f98cf5db714e4a0f",
+    "required_build_receipts": [
+      "release-inputs-package.json",
+      "release-inputs-signature.json"
+    ]
   },
   "toolkit_revision": "0aa9122ba9e45774c2073ea0f98cf5db714e4a0f",
   "sign_releases": true,
