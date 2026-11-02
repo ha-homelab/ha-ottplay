@@ -7,7 +7,7 @@ permissions:
   security-events: write
 jobs:
   security:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@0aa9122ba9e45774c2073ea0f98cf5db714e4a0f
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/security-scan.yml@f7165baf01f1d772beac2089ce7f7932bff5ae79
     permissions:
       contents: read
       actions: read
