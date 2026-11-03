@@ -10,6 +10,13 @@ Python and security workflows, the real Home Assistant test suite, HACS validati
 and Hassfest. Required checks are collected into a final gate that fails when a
 required job fails or is skipped. A local passing test does not substitute for CI.
 
+The isolated test runtime currently pins Home Assistant `2026.11.0b3`, whose
+upstream dependency set includes the patched Pillow `13.0.0`. Keep that complete
+dependency set in `uv.lock`; do not override a stable Core release's incompatible
+Pillow pin. This prerelease is a CI compatibility baseline. The integration's
+minimum supported HA version and the version installed in a home are configured
+separately. Requalify the tests before moving this baseline to a later release.
+
 `.release-policy.json` is the source of the generated shared release machinery.
 Its toolkit revision is pinned. The workflow builds a frozen version plan and
 packs tracked integration inputs with fixed ZIP metadata, producing:
