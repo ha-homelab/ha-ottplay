@@ -34,9 +34,9 @@ jobs:
       - id: scope
         name: Classify documentation and build inputs
         env:
-          DOCUMENTATION_PATHS: '[]'
-          REQUIRED_PATHS: '[]'
-          FORCE_FULL: 'true'
+          DOCUMENTATION_PATHS: "[\"README.ar.md\", \"README.bn.md\", \"README.cs.md\", \"README.de.md\", \"README.es.md\", \"README.fa.md\", \"README.fr.md\", \"README.he.md\", \"README.hi.md\", \"README.id.md\", \"README.it.md\", \"README.ja.md\", \"README.ko.md\", \"README.nl.md\", \"README.pl.md\", \"README.pt.md\", \"README.ru.md\", \"README.th.md\", \"README.tr.md\", \"README.uk.md\", \"README.vi.md\", \"README.zh-Hans.md\", \"README.zh-Hant.md\"]"
+          REQUIRED_PATHS: "[\"CHANGELOG.md\"]"
+          FORCE_FULL: "${{ inputs.force-full && 'true' || 'false' }}"
         run: |
           args=()
           if [[ "$FORCE_FULL" == true ]]; then args+=(--force); fi
@@ -58,7 +58,6 @@ jobs:
     needs:
       - scope
       - workflow-contracts
-    if: ${{ needs.scope.outputs.run == 'true' }}
   check-2:
     uses: ./.github/workflows/security.yml
     permissions:
@@ -68,7 +67,14 @@ jobs:
     needs:
       - scope
       - workflow-contracts
-    if: ${{ needs.scope.outputs.run == 'true' }}
+  check-3:
+    uses: ./.github/workflows/documentation.yml
+    permissions:
+      contents: read
+      actions: read
+    needs:
+    - scope
+    - workflow-contracts
   workflow-contracts:
     name: CI configuration contracts
     runs-on: ${{ fromJSON((vars.CI_RUNNER_MODE == 'self-hosted' || vars.CI_RUNNER_MODE == 'k3s') && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (contains(fromJSON('["push","schedule","workflow_dispatch"]'), github.event_name) && github.ref == format('refs/heads/{0}', github.event.repository.default_branch))) && (vars.CI_RUNNER_LABELS || '[]') || '["ubuntu-latest"]') }}
@@ -106,7 +112,6 @@ jobs:
           if-no-files-found: ignore
     needs:
       - scope
-    if: ${{ needs.scope.outputs.run == 'true' }}
   release-contracts:
     name: Release tooling contracts
     runs-on: ${{ fromJSON((vars.CI_RUNNER_MODE == 'self-hosted' || vars.CI_RUNNER_MODE == 'k3s') && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) || (contains(fromJSON('["push","schedule","workflow_dispatch"]'), github.event_name) && github.ref == format('refs/heads/{0}', github.event.repository.default_branch))) && (vars.CI_RUNNER_LABELS || '[]') || '["ubuntu-latest"]') }}
@@ -136,6 +141,7 @@ jobs:
       - check-0
       - check-1
       - check-2
+      - check-3
       - workflow-contracts
       - release-contracts
     if: ${{ always() }}
@@ -153,8 +159,8 @@ jobs:
           python3 - <<'PY'
           import json, os
           results = json.loads(os.environ['RESULTS'])
-          expected = ['check-0', 'check-1', 'check-2', 'release-contracts', 'scope', 'workflow-contracts']
-          always = ['scope']
+          expected = ['check-0', 'check-1', 'check-2', 'check-3', 'release-contracts', 'scope', 'workflow-contracts']
+          always = ['check-1', 'check-2', 'check-3', 'scope', 'workflow-contracts']
           if set(results) != set(expected):
               raise SystemExit('Validation job inventory differs')
           scope = results['scope']

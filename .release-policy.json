@@ -8,7 +8,8 @@
   "validation_workflows": [
     "tests.yml",
     "validate.yml",
-    "security.yml"
+    "security.yml",
+    "documentation.yml"
   ],
   "artifact_pattern": "release-assets*",
   "local_checks": [
@@ -21,7 +22,10 @@
   "notes": [
     "Entities are discovered from a configured OTTPlay Control Server. A registered device is unavailable while disconnected; HTTP command acceptance alone is not proof of playback.",
     "Both release archives carry the same versioned integration: ottplay.zip is the HACS root layout; ha-ottplay.zip is the manual custom_components/ottplay layout. Household endpoints, identifiers, tokens, and live captures are excluded.",
-    "Unit and Home Assistant runtime tests cover simulated server behavior. Real server installation and observed commands are separate acceptance evidence, not a guarantee for every platform."
+    "Unit and Home Assistant runtime tests cover simulated server behavior. Real server installation and observed commands are separate acceptance evidence, not a guarantee for every platform.",
+    "The configured release-note file remains a full-validation input so its current release section, upgrade notes and security notes are checked.",
+    "Documentation-consuming checks remain active on documentation-only PRs through the lightweight documentation validator.",
+    "HACS information-file and image checks remain active for documentation-only pull requests."
   ],
   "versioning": {
     "schema": 1,
@@ -76,5 +80,40 @@
   "sign_releases": true,
   "fuzzing": {
     "toolkit_ref": "f7165baf01f1d772beac2089ce7f7932bff5ae79"
+  },
+  "change_scope": {
+    "documentation_paths": [
+      "README.ar.md",
+      "README.bn.md",
+      "README.cs.md",
+      "README.de.md",
+      "README.es.md",
+      "README.fa.md",
+      "README.fr.md",
+      "README.he.md",
+      "README.hi.md",
+      "README.id.md",
+      "README.it.md",
+      "README.ja.md",
+      "README.ko.md",
+      "README.nl.md",
+      "README.pl.md",
+      "README.pt.md",
+      "README.ru.md",
+      "README.th.md",
+      "README.tr.md",
+      "README.uk.md",
+      "README.vi.md",
+      "README.zh-Hans.md",
+      "README.zh-Hant.md"
+    ],
+    "required_paths": [
+      "CHANGELOG.md"
+    ],
+    "always_validate_workflows": [
+      "security.yml",
+      "documentation.yml",
+      "validate.yml"
+    ]
   }
 }
