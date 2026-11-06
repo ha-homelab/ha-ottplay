@@ -10,15 +10,11 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class ReleaseScopeContract(unittest.TestCase):
     def workflow(self):
-        return yaml.safe_load(
-            (ROOT / ".github/workflows/release-pipeline.yml").read_text()
-        )
+        return yaml.safe_load((ROOT / ".github/workflows/release-pipeline.yml").read_text())
 
     def test_release_entry_always_requires_full_validation(self):
         classifiers = [
-            step
-            for step in self.workflow()["jobs"]["scope"]["steps"]
-            if step.get("id") == "scope"
+            step for step in self.workflow()["jobs"]["scope"]["steps"] if step.get("id") == "scope"
         ]
         self.assertEqual(len(classifiers), 1, "Expected one release scope classifier")
         self.assertEqual(classifiers[0]["env"]["FORCE_FULL"], "true")
