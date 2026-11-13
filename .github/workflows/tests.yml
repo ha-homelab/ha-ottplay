@@ -5,7 +5,7 @@ permissions:
   contents: read
 jobs:
   python:
-    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@ae771fd5815338336bbf5f887ad1c2f0e1203ee6 # main
+    uses: victron-venus/venus-os-ci-toolkit/.github/workflows/python-ci.yml@6472c9fea1eb72f9c706548092036de36230b7aa # main
     with:
       python-version: '3.14'
       install-dependencies: true
