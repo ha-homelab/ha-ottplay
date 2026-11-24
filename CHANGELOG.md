@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.1.2] - Unreleased
+
+### Changed
+
+- keep local instruction files out of git.
+- add a navigation index for docs/.
+- isolate every auto-merge base edit (#44).
+- preserve merge identity and withdrawn auto-merge requests (#42).
+- complete reviewed dependency approval and merge wiring (#39).
+- use the shared CI regeneration guide (#37).
+- skip heavy validation for documentation-only changes (#36).
+- Complete dependency update migration to Renovate (#35).
+- recheck automatic publication source (#34).
+- reconcile lost creation responses (#33).
+
+### Upgrade
+
+Install the updated integration through HACS or replace only
+`custom_components/ottplay` with the manual release archive, then restart Home
+Assistant Core. Existing entries, entity IDs and dashboards need no
+reconfiguration. A configuration-entry reload alone does not load changed Python
+modules. Back up the installed integration before updating.
+
+### Security
+
+The existing controller URL, scoped operator token and command restrictions are
+unchanged. Authentication failures still require reauthentication; a successful
+read from one player cannot clear a server-wide failure. No new credentials or
+permissions are required.
+
 ## [0.1.1]
 
 - Keep the last observed player state while confirming volume, playback and remote commands, avoiding false `unavailable` transitions and disappearing dashboard cards.
